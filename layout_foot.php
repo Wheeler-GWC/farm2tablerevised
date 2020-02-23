@@ -13,6 +13,7 @@
 <script src="libs/js/react/components/foods/create.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/foods/show.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/foods/index.jsx" type="text/jsx"></script>
+<script src="libs/js/react/components/orders/index.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/login/login.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/login/register.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/layouts/nav.jsx" type="text/jsx"></script>

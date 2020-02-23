@@ -35,8 +35,7 @@ if(isset($_GET['item_per_page']))
     if(!empty($_GET['item_per_page']))
         $limit = $_GET['item_per_page'];
 
-// $results = $food->readAll();
+//$results = $food->readAll();
 $results = $food->paginate($where, $currentPage, $limit, $orderBy, $orderType);
-
 // output in json format
 echo $results;

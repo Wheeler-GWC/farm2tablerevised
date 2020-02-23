@@ -47,19 +47,11 @@ var CreateFoodComponent = React.createClass({
         });
     },
 
-    defaultDate: function(expire_date) {
-        if (!expire_date || expire_date == '') {
-            return '9999-12-31';
-        } else {
-            return expire_date;
-        }
-    },
-
     onSave: function(e) {
         $.post('api/create_food.php', {
                 item: this.state.item,
                 quantity: this.state.quantity,
-                expire_date: this.defaultDate(this.state.expire_date)
+                expire_date: this.state.expire_date
             },
             function(res) {
                 this.setState({successCreation: res});

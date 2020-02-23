@@ -27,6 +27,10 @@ class Food{
             $quantity=htmlspecialchars(strip_tags($this->quantity));
             $expire_date=htmlspecialchars(strip_tags($this->expire_date));
 
+            if ($expire_date == '') {
+                $expire_date = null;
+            }
+
             $stmt->bindParam(':item', $item);
             $stmt->bindParam(':quantity', $quantity);
             $stmt->bindParam(':expire_date', $expire_date);
@@ -93,9 +97,7 @@ class Food{
 
     public function readOne(){
 
-        $query = "SELECT f.id, f.item, f.quantity, f.expire_date, f.created_at
-                    FROM " . $this->table_name . " f
-                    WHERE f.id=:id";
+        $query = "SELECT id, item, quantity, expire_date, created_at FROM food_items WHERE id=:id";
 
         $stmt = $this->conn->prepare($query);
 

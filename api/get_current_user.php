@@ -16,4 +16,5 @@ if(isset($_SESSION['id'])) {
     $user->id = $_SESSION['id'];
     $userObject = $user->readOne();
 }
+
 echo $userObject;

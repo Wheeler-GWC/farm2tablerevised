@@ -13,32 +13,20 @@ var UpdateFoodComponent = React.createClass({
     },
 
     componentDidMount: function() {
-        var foodId = this.props.foodId;
-
+        const foodId = this.props.foodId;
         this.serverRequestFood = $.post('api/read_one_food.php',
             {food_id: foodId},
             function(food) {
-                var p = JSON.parse(food)[0];
+                const f = JSON.parse(food)[0];
                 this.setState({id: f.id});
                 this.setState({item: f.item});
                 this.setState({quantity: f.quantity});
                 this.setState({expire_date: f.expire_date});
                 $('.page-header h1').text(f.item);
             }.bind(this));
-
-        this.serverRequest = $.get('api/is_logged_in.php', function(result) {
-            if(result == 'true')
-                this.setState({
-                    isLoggedIn: result
-                });
-            else
-                window.location.href = '#';
-        }.bind(this));
     },
 
     componentWillUnmount: function() {
-        this.serverRequest.abort();
-        this.serverRequestCat.abort();
         this.serverRequestFood.abort();
     },
 
@@ -69,6 +57,7 @@ var UpdateFoodComponent = React.createClass({
 
     render: function() {
         return (
+            !!this.props.isAdmin ?
             <div>
                 {
                     this.state.successUpdate == "true" ?
@@ -122,7 +111,7 @@ var UpdateFoodComponent = React.createClass({
                             <td>
                                 <input
                                     type="date"
-                                    value={this.state.price}
+                                    value={this.state.expire_date}
                                     className="form-control"
                                     onChange={this.onExpireDateChange}
                                 />
@@ -140,6 +129,9 @@ var UpdateFoodComponent = React.createClass({
                     </table>
                 </form>
             </div>
+            : <div>
+                <h1>You must be an administrator to view this page</h1>
+              </div>
         );
     }
 });

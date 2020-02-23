@@ -1,57 +1,44 @@
 "use strict";
 
-var FoodRow = React.createClass({
+const FoodRow = React.createClass({
     render: function() {
+        const food = this.props.food;
         return (
             <tr>
                 <td>
                     <input type="checkbox"
                            className='checkboxes'
-                           checked={(this.props.selectedRows && this.props.selectedRows.indexOf(this.props.food.id)) >= 0}
-                           onChange={(e) => this.props.toggleOne(e.target.checked, this.props.food.id)} />
+                           checked={(this.props.selectedRows && this.props.selectedRows.indexOf(food.id)) >= 0}
+                           onChange={(e) => this.props.toggleOne(e.target.checked, food.id)} />
                 </td>
-                <td>{this.props.food.item}</td>
-                <td>{this.props.food.quantity}</td>
-                <td>{this.props.food.expire_date}</td>
+                <td>{food.item}</td>
+                <td>{food.quantity}</td>
+                <td>{food.expire_date}</td>
                 {
-                    (this.props.isLoggedIn && this.props.isAdmin)
-                    ?
+                    (this.props.isLoggedIn && !!this.props.isAdmin) &&
                         <td>
-                            {/*<a href={'#show?id='+this.props.food.id}
-                               className="btn btn-info m-r-1em">
-                                View
-                            </a>*/}
-                            <a href={'#update?id='+this.props.food.id}
+                            <a href={'#update?id='+food.id}
                                className="btn btn-primary m-r-1em">
                                 Edit
                             </a>
-                            <a href={'#delete?id='+this.props.food.id}
+                            <a href={'#delete?id='+food.id}
                                className="btn btn-danger">
                                 Delete
                             </a>
                         </td>
-                    :
-                        {/*
-                        <td>
-                            <a href={'#show?id='+this.props.food.id}
-                               className="btn btn-info m-r-1em">
-                                View
-                            </a>
-                        </td>
-                        */}
                 }
             </tr>
         );
     }
 });
 
-var FoodsTable = React.createClass({
+const FoodsTable = React.createClass({
     sortChanged: function(sortColumnName, order) {
         this.props.sortChanged(sortColumnName, order);
     },
 
     render: function() {
-        var rows = this.props.foods.map(function(food, i) {
+        let rows = this.props.foods.map(function(food, i) {
             return (
                 <FoodRow
                     key={i}
@@ -60,6 +47,7 @@ var FoodsTable = React.createClass({
                     toggleOne={this.props.toggleOne}
                     selectedRows={this.props.selectedRows}
                     isLoggedIn={this.props.isLoggedIn}
+                    user={this.props.user}
                     isAdmin={this.props.isAdmin}
                 />
             );
@@ -81,22 +69,21 @@ var FoodsTable = React.createClass({
                                 <i className={this.props.sortClass('f.item')}></i>
                             </a>
                         </th>
-                        <th style={{width:'40%'}}>
+                        <th style={{width:'20%'}}>
                             <a onClick={this.props.sortChanged.bind(null, 'quantity', this.props.orderType)}>
                                 Quantity
                                 <i className={this.props.sortClass('quantity')}></i>
                             </a>
                         </th>
-                        <th style={{width:'9%'}}>
+                        <th style={{width:'30%'}}>
                             <a onClick={this.props.sortChanged.bind(null, 'expire_date', this.props.orderType)}>
                                 Expiration Date
                                 <i className={this.props.sortClass('expire_date')}></i>
                             </a>
                         </th>
                         {
-                            this.props.isLoggedIn &&
-                            this.props.isAdmin &&
-                            <th>Action</th>
+                        !!this.props.isAdmin &&
+                        <th>Action</th>
                         }
                     </tr>
                     </thead>
@@ -108,7 +95,7 @@ var FoodsTable = React.createClass({
     }
 });
 
-var SearchByName = React.createClass({
+const SearchByName = React.createClass({
 
     render: function() {
         return (
@@ -117,7 +104,7 @@ var SearchByName = React.createClass({
                     <input
                         type="text"
                         className="form-control searchbox"
-                        placeholder="Type a name..."
+                        placeholder="Type something..."
                         required
                         onChange={this.props.onInputSearchChange} value={this.props.searchText} />
                     <div className="input-group-btn">
@@ -131,14 +118,14 @@ var SearchByName = React.createClass({
     }
 });
 
-var TopActionsComponent = React.createClass({
+const TopActionsComponent = React.createClass({
     render: function() {
         return (
             <div className="">
                 <SearchByName searchText={this.props.searchText} searchTerm={this.props.searchTerm} onInputSearchChange={this.props.onInputSearchChange} />
 
                 {
-                    (this.props.isLoggedIn == 'true')
+                    (!!this.props.isLoggedIn && this.props.isAdmin)
                     ?
                         <div>
                             <a href="#create" className="btn btn-primary margin-bottom-1em pull-right" >
@@ -151,14 +138,18 @@ var TopActionsComponent = React.createClass({
                                 Delete Selected Items
                             </button>
                         </div>
-                    : null
+                    :
+                    !!this.props.user && 
+                    <button data-toggle="modal" data-target="#confirmOrderModal" className="btn btn-success margin-bottom-1em pull-right" onClick={this.props.buildConfirmationList} style={{marginRight:'10px'}}>
+                        Place Order
+                    </button>
                 }
             </div>
         );
     }
 });
 
-var Loader = React.createClass({
+const Loader = React.createClass({
     render: function() {
         if(this.props.isLoading == true) {
             return <div className="text-center">Loading...</div>;
@@ -167,17 +158,17 @@ var Loader = React.createClass({
     }
 });
 
-var PaginationComponent = React.createClass({
+const PaginationComponent = React.createClass({
     render: function() {
 
-        var pagesAmount = Math.ceil(this.props.foodsAmount / this.props.foodsPerPage);
-        var itemPerPage = this.props.foodsPerPage;
-        var orderBy = this.props.orderBy;
-        var orderType = this.props.orderType;
-        var search = this.props.search;
-        var appendUrl = '&search=' + search + '&order_by=' + orderBy + '&order_type=' + orderType + '&item_per_page=' + itemPerPage;
+        let pagesAmount = Math.ceil(this.props.foodsAmount / this.props.foodsPerPage);
+        let itemPerPage = this.props.foodsPerPage;
+        let orderBy = this.props.orderBy;
+        let orderType = this.props.orderType;
+        let search = this.props.search;
+        let appendUrl = '&search=' + search + '&order_by=' + orderBy + '&order_type=' + orderType + '&item_per_page=' + itemPerPage;
 
-        var pageIndicators = [];
+        let pageIndicators = [];
         for (let i=1; i <= pagesAmount; i++) {
             pageIndicators.push(
                 <li className={i == this.props.currentPage ? "active":""} key={i}>
@@ -264,7 +255,7 @@ var PaginationComponent = React.createClass({
     }
 });
 
-var ReadFoodsComponent = React.createClass({
+const ReadFoodsComponent = React.createClass({
     getInitialState: function() {
         return {
             search: this.props.search,
@@ -276,28 +267,11 @@ var ReadFoodsComponent = React.createClass({
             count: 0,
             loading: true,
             selectedRows: [],
-            isLoggedIn: '',
-            isAdmin: false
+            confirmationList: []
         };
     },
 
     componentDidMount: function() {
-        this.serverRequest = $.get('api/is_logged_in.php', function(result) {
-            this.setState({
-                isLoggedIn: result
-            });
-        }.bind(this));
-
-        this.serverRequest = $.get('api/get_current_user.php', function(result) {
-            console.log('RESULT: ', JSON.parse(result)[0]);
-            const isAdmin = JSON.parse(result)[0].is_admin;
-            if (isAdmin === 1 || isAdmin === '1') {
-                this.setState({
-                    isAdmin: isAdmin
-                });
-            }
-        }.bind(this));
-        console.log('Is Admin: ', this.state.isAdmin);
         this.populateFoods();
     },
 
@@ -306,14 +280,13 @@ var ReadFoodsComponent = React.createClass({
     },
 
     populateFoods: function() {
-        var parameters = {
+        let parameters = {
             name: this.state.search,
             page: this.state.currentPage,
             item_per_page: this.state.limit,
             order_by: this.state.orderBy,
             order_type: this.state.orderType
         };
-
         this.serverRequest = $.get('api/read_all_foods.php', parameters,
             function(foods) {
                 if(this.isMounted()) {
@@ -333,8 +306,8 @@ var ReadFoodsComponent = React.createClass({
     },
 
     onInputPageChange: function(e) {
-        var page = parseInt(e.target.value);
-        var totalPage = Math.ceil(this.state.count / this.state.limit);
+        let page = parseInt(e.target.value);
+        let totalPage = Math.ceil(this.state.count / this.state.limit);
 
         if(page > totalPage) {
             page = totalPage;
@@ -355,11 +328,6 @@ var ReadFoodsComponent = React.createClass({
     pageChanged: function(destPage, e) {
         window.location.replace('#page=' + destPage + '&search=' + this.state.search + '&order_by=' + this.state.orderBy + '&order_type=' + this.state.orderType + '&item_per_page=' + this.state.limit);
 
-        /**
-         * setState() does not immediately mutate this.state but creates a pending state transition. Accessing this.state after calling this method
-         * can potentially return the existing value. There is no guarantee of synchronous operation of calls to setState and calls may be batched
-         * for performance gains.
-         */
         this.setState({
             currentPage: destPage
         }, function() {
@@ -427,7 +395,7 @@ var ReadFoodsComponent = React.createClass({
 
     toggleAll: function(e) {
         if(e.target.checked) {
-            var selectedFoods = [];
+            let selectedFoods = [];
             this.state.foods.forEach(function(food) {
                 selectedFoods.push(food.id);
             });
@@ -439,7 +407,7 @@ var ReadFoodsComponent = React.createClass({
 
     deleteSelected: function() {
         if(this.state.selectedRows.length > 0) {
-            var r = confirm("Are you sure you want to delete the selected item(s)?");
+            let r = confirm("Are you sure you want to delete the selected item(s)?");
             if (r == true) {
                 $.post('api/delete_foods.php',
                     {del_ids: this.state.selectedRows},
@@ -463,6 +431,34 @@ var ReadFoodsComponent = React.createClass({
         }
     },
 
+    placeOrder: function() {
+        if (this.state.selectedRows.length > 0) {
+            $.post('api/create_order.php',
+                {
+                    items: this.state.confirmationList,
+                    userId: this.props.user.id
+                },
+                function (res) {
+                    console.log(res);
+                    if (res == 'true' || res == 1) {
+                        alert('Order Placed Successfully!');
+                        this.setState({selectedRows: []});
+                        this.setState({confirmationList: []});
+                    } else {
+                        alert('Order Failed! ', res);
+                    }
+                }.bind(this));
+        } 
+    },
+
+    buildConfirmationList: function() {
+        let confirmationList = [];
+        for (let i = 0; i < this.state.selectedRows.length; i++) {
+            confirmationList.push(this.state.selectedRows[i]);
+        }
+        this.setState({confirmationList: confirmationList});
+    },
+
     itemPerPageChanged: function(e) {
         this.setState({
             limit: e.target.value,
@@ -474,7 +470,12 @@ var ReadFoodsComponent = React.createClass({
     },
 
     render: function() {
-        var filteredFoods = this.state.foods;
+        let filteredFoods;
+        if (this.state.search === '') {
+            filteredFoods = this.state.foods;
+        } else {
+            filteredFoods = this.state.foods.filter(food => food.item.toLowerCase().includes(this.state.search.toLowerCase()));
+        }
         if(this.state.search != ''){
             $('.page-header h1').text('Search "'+ this.state.search +'"');
         }else{
@@ -482,13 +483,17 @@ var ReadFoodsComponent = React.createClass({
         }
 
         return (
-            <div className="overflow-hidden">
+            <div className="overflow-hidden container-fluid">
                 <TopActionsComponent
                     searchText={this.state.search}
                     onInputSearchChange={this.onInputSearchChanged}
                     searchTerm={this.searchTerm}
                     deleteSelected={this.deleteSelected}
-                    isLoggedIn={this.state.isLoggedIn}
+                    placeOrder={this.placeOrder}
+                    isLoggedIn={this.props.isLoggedIn}
+                    user={this.props.user}
+                    isAdmin={this.props.isAdmin}
+                    buildConfirmationList={this.buildConfirmationList}
                 />
 
                 <Loader isLoading={this.state.loading} />
@@ -501,8 +506,9 @@ var ReadFoodsComponent = React.createClass({
                     sortClass={this.sortClass}
                     sortChanged={this.sortChanged}
                     selectedRows={this.state.selectedRows}
-                    isLoggedIn={this.state.isLoggedIn}
-                    isAdmin={this.state.isAdmin}
+                    isLoggedIn={this.props.isLoggedIn}
+                    user={this.props.user}
+                    isAdmin={this.props.isAdmin}
                 />
 
                 <PaginationComponent
@@ -516,7 +522,69 @@ var ReadFoodsComponent = React.createClass({
                     goToInputPage={this.goToInputPage}
                     orderBy={this.props.orderBy}
                     orderType={this.props.orderType} />
+                <ConfirmationModal
+                    confirmationList={this.state.confirmationList}
+                    placeOrder={this.placeOrder}
+                />
             </div>
+        );
+    }
+});
+
+class ItemDetails extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            id: 0,
+            item: '',
+            quantity: 0
+        }
+    }
+
+    componentDidMount() {
+        this.getItemDetails();
+    }
+
+    getItemDetails() {
+        this.serverRequestFood = $.post('api/read_one_food.php',
+        {food_id: this.props.foodId},
+        function(food) {
+            const f = JSON.parse(food)[0];
+            this.setState({id: f.id});
+            this.setState({item: f.item});
+            this.setState({quantity: f.quantity});
+        }.bind(this));
+    }
+    
+    render() {
+        return(
+            <p>{this.state.item} : {this.state.quantity}</p>
+        );
+    }
+};
+
+const ConfirmationModal = React.createClass({
+    render() {
+        return (
+          <div className="modal" id="confirmOrderModal" tabindex="-1" z-index="1" role="dialog" aria-labelledby="modalCenterTitle" aria-hidden="true">
+              <div className="modal-dialog modal-dialog-centered" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h3 className="modal-title">Confirm Order</h3>
+                    </div>
+                    <div className="modal-body">
+                        { this.props.confirmationList.length > 0 ?
+                            this.props.confirmationList.map((i,key) => <ItemDetails key={key} foodId={i}/>)
+                            : <p>Please select at least one item.</p>
+                        }
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-danger" data-dismiss="modal">Cancel</button>
+                        <button type="button" disabled={this.props.confirmationList == 0} className="btn btn-success" onClick={this.props.placeOrder}>Confirm</button>
+                    </div>
+                </div>
+              </div>
+          </div>
         );
     }
 });

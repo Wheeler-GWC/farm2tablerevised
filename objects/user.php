@@ -71,10 +71,11 @@ class User{
                 $email=htmlspecialchars(strip_tags($this->email));
                 $password=htmlspecialchars(strip_tags($this->password));
                 $salted_password = password_hash($password, PASSWORD_BCRYPT);
+                $is_admin = 0;
 
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':password', $salted_password);
-                $stmt->bindParam(':is_admin', false);
+                $stmt->bindParam(':is_admin', $is_admin);
 
                 if($stmt->execute()){
                     return 'true';

@@ -26,8 +26,43 @@ var MainApp = React.createClass({
     getInitialState: function() {
         return {
             currentMode: 'read',
-            foodId: null
+            foodId: null,
+            isLoggedIn: '',
+            user: ''
         };
+    },
+
+    logout: function() {
+        $.get('api/logout.php', function(result) {
+            if(result == 'ok')
+                this.setState({
+                    isLoggedIn: 'false',
+                    user: ''
+                });
+
+            window.location.href = "#login";
+        }.bind(this));
+    },
+
+    componentDidMount: function() {
+        this.serverRequest = $.get('api/is_logged_in.php', function(result) {
+            this.setState({
+                isLoggedIn: result
+            });
+        }.bind(this));
+
+        this.serverRequest = $.get('api/get_current_user.php', function(result) {
+            if(result != '') {
+                var u = JSON.parse(result)[0];
+                this.setState({
+                    user: u
+                });
+            }
+        }.bind(this));
+    },
+
+    componentWillUnmount: function() {
+        this.serverRequest.abort();
     },
 
     changeAppMode: function(newMode, foodId) {
@@ -43,6 +78,9 @@ var MainApp = React.createClass({
     },
 
     render: function() {
+
+        const isAdmin = this.state.user.is_admin == 1 ? true : false;
+
         var defaultItemPerPage = 5;
         var defaultSearchText = "";
         var defaultCurrentPage = 1;
@@ -88,7 +126,16 @@ var MainApp = React.createClass({
         sortType = (order_type === undefined) ? defaultOrderType : order_type;
         itemPerPage = (item_per_page === undefined) ? defaultItemPerPage : item_per_page;
 
-        var modeComponent = <ReadFoodsComponent itemPerPage={defaultItemPerPage} currentPage={defaultCurrentPage} search={defaultSearchText} orderBy={defaultOrderBy} orderType={defaultOrderType} />;
+        var modeComponent = <ReadFoodsComponent 
+                                itemPerPage={defaultItemPerPage} 
+                                currentPage={defaultCurrentPage} 
+                                search={defaultSearchText} 
+                                orderBy={defaultOrderBy} 
+                                orderType={defaultOrderType}
+                                isLoggedIn={this.state.isLoggedIn}
+                                user={this.state.user}
+                                isAdmin={isAdmin}
+                            />;
 
         switch(currentMode) {
             case 'read':
@@ -96,39 +143,96 @@ var MainApp = React.createClass({
             case 'page':
                 initialPage = getParameterByName(pageParameterName);
                 initialPage = parseInt(initialPage) <= 0 ? "1" : initialPage;
-                modeComponent = <ReadFoodsComponent itemPerPage={itemPerPage} currentPage={initialPage} search={searchedTerm} orderBy={sortColumn} orderType={sortType} />;
+                modeComponent = <ReadFoodsComponent 
+                                    itemPerPage={itemPerPage} 
+                                    currentPage={initialPage} 
+                                    search={searchedTerm} 
+                                    orderBy={sortColumn} 
+                                    orderType={sortType} 
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                />;
                 break;
             case 'show':
                 foodId = (this.props.location[0].split('?')[1]).split('=')[1];
-                modeComponent = <ReadOneFoodComponent foodId={foodId} />;
+                modeComponent = <ReadOneFoodComponent 
+                                    foodId={foodId} 
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                />;
                 break;
             case 'create':
-                modeComponent = <CreateFoodComponent changeAppMode={this.changeAppMode} />;
+                modeComponent = <CreateFoodComponent 
+                                    changeAppMode={this.changeAppMode}
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                />;
                 break;
             case 'update':
                 foodId = (this.props.location[0].split('?')[1]).split('=')[1];
-                modeComponent = <UpdateFoodComponent foodId={foodId}/>;
+                modeComponent = <UpdateFoodComponent 
+                                    foodId={foodId}
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                />;
                 break;
             case 'delete':
                 foodId = (this.props.location[0].split('?')[1]).split('=')[1];
-                modeComponent = <DeleteFoodComponent foodId={foodId} />;
+                modeComponent = <DeleteFoodComponent 
+                                    foodId={foodId} 
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user} 
+                                    isAdmin={isAdmin}  
+                                />;
                 break;
             case 'login':
-                modeComponent = <LoginComponent />;
+                modeComponent = <LoginComponent 
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                />;
                 break;
             case 'register':
-                modeComponent = <RegisterComponent />;
+                modeComponent = <RegisterComponent
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                />;
+                break;
+            case 'ordersummary':
+                modeComponent = isAdmin ?
+                                <ReadOrdersComponent
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                /> :
+                                <NotFoundComponent 
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                />;
                 break;
             default:
-                $('.page-header').html('<h1>Oops..</h1>');
-                modeComponent = <NotFoundComponent />;
+                $('.page-header').html('<h1>404</h1>');
+                modeComponent = <NotFoundComponent 
+                                    isLoggedIn={this.state.isLoggedIn}
+                                    user={this.state.user}
+                                    isAdmin={isAdmin}
+                                />;
                 break;
         }
-        var navComponent = <NavComponent />;
         return (
             <div>
                 {
-                    navComponent
+                    <NavComponent
+                        user={this.state.user}
+                        isLoggedIn={this.state.isLoggedIn}
+                        isAdmin={isAdmin}
+                        logout={this.logout}
+                    />
                 }
                 {
                     modeComponent
