@@ -112,9 +112,7 @@ class Food{
 
     public function update(){
 
-        $query = "UPDATE food_items
-                SET item=:item, quantity=:quantity, expire_date=:expire_date
-                WHERE id=:id";
+        $query = "UPDATE food_items SET item=:item, quantity=:quantity, expire_date=:expire_date WHERE id=:id";
 
         $stmt = $this->conn->prepare($query);
 
@@ -122,6 +120,10 @@ class Food{
         $quantity=htmlspecialchars(strip_tags($this->quantity));
         $expire_date=htmlspecialchars(strip_tags($this->expire_date));
         $id=htmlspecialchars(strip_tags($this->id));
+
+        if ($expire_date == '') {
+            $expire_date = null;
+        }
 
         $stmt->bindParam(':item', $item);
         $stmt->bindParam(':quantity', $quantity);
