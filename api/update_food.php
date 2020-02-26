@@ -15,10 +15,11 @@ if($_POST){
     } else if(is_null($_POST['quantity']) || empty($_POST['quantity'])) {
         $result = "The quantity must be filled.";
     } else {
+        $food->id = $_POST['id'];
         $food->item = $_POST['item'];
         $food->quantity = $_POST['quantity'];
-        $food->expire_data = $_POST['expire_date'];
-        $food = $food->update() ? "true" : 'false';
+        $food->expire_date = $_POST['expire_date'];
+        $result = $food->update() ? "true" : 'false';
     }
     echo $result;
 }
