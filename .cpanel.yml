@@ -1,0 +1,4 @@
+---
+deployment:
+  tasks:
+    - cp -r * $DEPLOYPATH
