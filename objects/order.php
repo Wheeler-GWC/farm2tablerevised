@@ -34,7 +34,8 @@ class Order{
 
     public function create_items() {
         try {
-            $query = "INSERT INTO order_items SET order_id=:order_id, item_id=:item_id";
+            $query = "INSERT INTO order_items SET order_id=:order_id, item_id=:item_id;";
+            $query .= "UPDATE food_items SET quantity = quantity - 1 WHERE id=:item_id";
             $stmt = $this->conn->prepare($query);
             $last_id=htmlspecialchars(strip_tags($this->last_id));
             $stmt->bindParam(':order_id', $last_id);
@@ -120,9 +121,12 @@ class Order{
 
     public function delete($ins){
         $ins=htmlspecialchars(strip_tags($ins));
+        $item = htmlspecialchars(strip_tags($this->item));
         $query = "DELETE FROM orders WHERE id IN ($ins)";
+        $query .= "UPDATE food_items SET item = item + 1 WHERE id = :item";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':ins', $ins);
+        $stmt->bindParam(':item', $item);
         if($stmt->execute()){
             return true;
         }else{
