@@ -9,6 +9,7 @@ class Order{
     public $items;
     public $userId;
     public $last_id;
+    public $quantity = 1;
 
     public function __construct($db){
         $this->conn = $db;
@@ -35,12 +36,14 @@ class Order{
     public function create_items() {
         try {
             $query = "INSERT INTO order_items SET order_id=:order_id, item_id=:item_id;";
-            $query .= "UPDATE food_items SET quantity = quantity - 1 WHERE id=:item_id";
+            $query .= "UPDATE food_items SET quantity = quantity - :quantity WHERE id=:item_id";
             $stmt = $this->conn->prepare($query);
             $last_id=htmlspecialchars(strip_tags($this->last_id));
             $stmt->bindParam(':order_id', $last_id);
             $item=htmlspecialchars(strip_tags($this->item));
             $stmt->bindParam(':item_id', $item);
+            $quantity = htmlspecialchars(strip_tags(this->quantity));
+            $stmt->bindParam(':quantity', $quantity);
             $stmt->execute();
 
             return true;
@@ -123,7 +126,7 @@ class Order{
         $ins=htmlspecialchars(strip_tags($ins));
         $item = htmlspecialchars(strip_tags($this->item));
         $query = "DELETE FROM orders WHERE id IN ($ins)";
-        $query .= "UPDATE food_items SET item = item + 1 WHERE id = :item";
+        // TODO: distinguish between cancellation and deletion and only subtract for one
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':ins', $ins);
         $stmt->bindParam(':item', $item);
