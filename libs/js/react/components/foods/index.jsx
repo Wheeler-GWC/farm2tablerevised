@@ -1,9 +1,31 @@
 "use strict";
 
 const FoodRow = React.createClass({
+    getInitialState: function() {
+        return {
+            isExpired: false
+        }
+    },
+
+    componentDidMount: function() {
+        const isExpired = this.checkForExpiration();
+        if (isExpired) {
+            this.setState({isExpired: isExpired});
+        }
+    },
+
+    checkForExpiration: function() {
+        return (
+            this.props.food.expire_date != null && 
+            this.props.food.expire_date != '' &&
+            this.props.food.expire_date <= new Date().toISOString().slice(0,10)
+        );
+    },
+
     render: function() {
         const food = this.props.food;
         return (
+            (!this.state.isExpired || !!this.props.isAdmin) ?
             <tr>
                 <td>
                     <input type="checkbox"
@@ -28,6 +50,7 @@ const FoodRow = React.createClass({
                         </td>
                 }
             </tr>
+            : null
         );
     }
 });
