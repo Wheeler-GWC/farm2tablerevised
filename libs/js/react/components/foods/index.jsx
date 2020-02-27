@@ -443,7 +443,7 @@ const ReadFoodsComponent = React.createClass({
                     if (res == 'true' || res == 1) {
                         alert('Order Placed Successfully!');
                         this.setState({selectedRows: []});
-                        this.setState({confirmationList: []});
+                        this.setState({confirmationList: []}, () => this.populateFoods());
                     } else {
                         alert('Order Failed! ', res);
                     }

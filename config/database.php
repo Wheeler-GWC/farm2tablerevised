@@ -4,7 +4,7 @@ class Database{
     private $host = "localhost";
     private $db_name = "farm2table";
     private $username = "root";
-    private $password = "root";
+    private $password = "";
     public $conn;
 
     public function getConnection(){
