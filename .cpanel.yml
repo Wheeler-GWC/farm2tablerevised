@@ -11,3 +11,4 @@ deployment:
     - /bin/cp layout_foot.php $DEPLOYPATH
     - /bin/cp layout_head.php $DEPLOYPATH
     - /bin/cp config/core.php $DEPLOYPATH
+    
