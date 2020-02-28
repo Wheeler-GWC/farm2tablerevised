@@ -1,4 +1,13 @@
 ---
 deployment:
   tasks:
-    - cp -r * $DEPLOYPATH
+    - /bin/cp -R api $DEPLOYPATH
+    - /bin/cp -R dependencies $DEPLOYPATH
+    - /bin/cp -R libs\js $DEPLOYPATH
+    - /bin/cp -R node_modules $DEPLOYPATH
+    - /bin/cp -R objects $DEPLOYPATH
+    - /bin/cp .gitignore $DEPLOYPATH
+    - /bin/cp index.php $DEPLOYPATH
+    - /bin/cp layout_foot.php $DEPLOYPATH
+    - /bin/cp layout_head.php $DEPLOYPATH
+    - /bin/cp config/core.php $DEPLOYPATH
