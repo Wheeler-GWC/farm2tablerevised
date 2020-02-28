@@ -1,10 +1,25 @@
 "use strict";
 
 const FoodRow = React.createClass({
+    getDateStyle: function() {
+        let dateStyle;
+        if (this.props.isExpired) {
+            dateStyle = {
+                color: 'red'
+            };
+        } else {
+            dateStyle = {
+                color: 'black'
+            };
+        }
+        return dateStyle;
+    },
+
     render: function() {
         const food = this.props.food;
+        const dateStyle = this.getDateStyle();
         return (
-            <tr>
+            <tr style={dateStyle}>
                 <td>
                     <input type="checkbox"
                            className='checkboxes'
@@ -37,9 +52,20 @@ const FoodsTable = React.createClass({
         this.props.sortChanged(sortColumnName, order);
     },
 
+    checkForExpiration: function(food) {
+        return (
+            food.expire_date != null && 
+            food.expire_date != '' &&
+            food.expire_date <= new Date().toISOString().slice(0,10)
+        );
+    },
+
     render: function() {
         let rows = this.props.foods.map(function(food, i) {
+            const isExpired = this.checkForExpiration(food);
             return (
+                (isExpired && !this.props.isAdmin) ?
+                null :
                 <FoodRow
                     key={i}
                     food={food}
@@ -49,6 +75,7 @@ const FoodsTable = React.createClass({
                     isLoggedIn={this.props.isLoggedIn}
                     user={this.props.user}
                     isAdmin={this.props.isAdmin}
+                    isExpired={isExpired}
                 />
             );
         }.bind(this));
