@@ -9,7 +9,7 @@ if($_POST){
     $order = new Order($db);
 
     $result;
-    $order->items = $_POST['items'];
+    $order->items = json_decode($_POST['items'], false);
     $order->userId = $_POST['userId'];
 
     try {
@@ -18,6 +18,8 @@ if($_POST){
         for ($i = 0; $i < count($order->items); $i++) {
             $order->last_id = $last_id;
             $order->item = $order->items[$i];
+            $order->item_id = $order->item->id;
+            $order->quantity = $order->item->quantity;
             if ($order->create_items()) {
                 $result = true;
             } else {
