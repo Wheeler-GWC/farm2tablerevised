@@ -8,7 +8,12 @@ var NavComponent = React.createClass({
             {
                 (this.props.isLoggedIn == 'false') ?
 
-                <nav className="navbar navbar-default navbar-fixed-top">
+                <nav className="navbar navbar-expand-lg navbar-light navbar-fixed-top bg-light">
+                    <a className="navbar-brand" href="#">Wheeler Farm To Table</a>
+                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+
                     <div className="container">
                         <div id="navbar" className="collapse navbar-collapse">
                             <ul className="nav navbar-nav">
@@ -20,7 +25,12 @@ var NavComponent = React.createClass({
                     </div>
                 </nav>
                 :
-                <nav className="navbar navbar-default navbar-fixed-top">
+                <nav className="navbar navbar-expand-lg navbar-light navbar-fixed-top bg-light">
+                    <a className="navbar-brand" href="#">Wheeler Farm To Table</a>
+                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+
                     <div className="container">
                         <div id="navbar" className="collapse navbar-collapse">
                             <ul className="nav navbar-nav">
