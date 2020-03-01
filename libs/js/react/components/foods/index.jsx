@@ -199,7 +199,7 @@ const TopActionsComponent = React.createClass({
                         </div>
                     :
                     !!this.props.user && 
-                    <button data-toggle="modal" data-target="#confirmOrderModal" className="btn btn-success margin-bottom-1em pull-right" onClick={this.props.buildConfirmationList} style={{marginRight:'10px'}}>
+                    <button data-toggle="modal" data-target="#confirmOrderModal" className="btn btn-success margin-bottom-1em pull-right" style={{marginRight:'10px'}}>
                         Place Order
                     </button>
                 }
@@ -326,8 +326,7 @@ const ReadFoodsComponent = React.createClass({
             orderedFoods: [],
             count: 0,
             loading: true,
-            selectedRows: [],
-            confirmationList: []
+            selectedRows: []
         };
     },
 
@@ -527,23 +526,18 @@ const ReadFoodsComponent = React.createClass({
         if (this.state.orderedFoods.length > 0) {
             $.post('api/create_order.php',
                 {
-                    items: JSON.stringify(this.state.confirmationList),
+                    items: JSON.stringify(this.state.orderedFoods),
                     userId: this.props.user.id
                 },
                 function (res) {
                     if (res == 'true' || res == 1) {
                         alert('Order Placed Successfully!');
-                        this.setState({orderedFoods: []});
-                        this.setState({confirmationList: []}, () => this.populateFoods());
+                        this.setState({orderedFoods: []}, () => this.populateFoods());
                     } else {
                         alert('Order Failed! ', res);
                     }
                 }.bind(this));
         } 
-    },
-
-    buildConfirmationList: function() {
-        this.setState({confirmationList: this.state.orderedFoods});
     },
 
     itemPerPageChanged: function(e) {
@@ -580,7 +574,6 @@ const ReadFoodsComponent = React.createClass({
                     isLoggedIn={this.props.isLoggedIn}
                     user={this.props.user}
                     isAdmin={this.props.isAdmin}
-                    buildConfirmationList={this.buildConfirmationList}
                 />
 
                 <Loader isLoading={this.state.loading} />
@@ -611,7 +604,7 @@ const ReadFoodsComponent = React.createClass({
                     orderBy={this.props.orderBy}
                     orderType={this.props.orderType} />
                 <ConfirmationModal
-                    confirmationList={this.state.orderedFoods}
+                    orderedFoods={this.state.orderedFoods}
                     placeOrder={this.placeOrder}
                 />
             </div>
@@ -624,8 +617,7 @@ class ItemDetails extends React.Component {
         super(props);
         this.state = {
             id: 0,
-            item: '',
-            quantity: 0
+            item: ''
         }
     }
 
@@ -640,13 +632,12 @@ class ItemDetails extends React.Component {
             const f = JSON.parse(food)[0];
             this.setState({id: f.id});
             this.setState({item: f.item});
-            this.setState({quantity: this.props.quantity});
         }.bind(this));
     }
     
     render() {
         return(
-            <p>{this.state.item}</p>
+        <p>{this.state.item}  :  {this.props.quantity}</p>
         );
     }
 };
@@ -661,14 +652,14 @@ const ConfirmationModal = React.createClass({
                         <h3 className="modal-title">Confirm Order</h3>
                     </div>
                     <div className="modal-body">
-                        { this.props.confirmationList.length > 0 ?
-                            this.props.confirmationList.map((i,key) => <ItemDetails key={key} foodId={i.id} quantity={i.quantity}/>)
+                        { this.props.orderedFoods.length > 0 ?
+                            this.props.orderedFoods.map((i,key) => <ItemDetails key={key} foodId={i.id} quantity={i.quantity}/>)
                             : <p>Please select at least one item.</p>
                         }
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-danger" data-dismiss="modal">Cancel</button>
-                        <button type="button" disabled={this.props.confirmationList == 0} className="btn btn-success" onClick={this.props.placeOrder}>Confirm</button>
+                        <button type="button" disabled={this.props.orderedFoods == 0} className="btn btn-success" onClick={this.props.placeOrder}>Confirm</button>
                     </div>
                 </div>
               </div>
