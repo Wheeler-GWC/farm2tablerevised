@@ -15,17 +15,39 @@ const FoodRow = React.createClass({
         return dateStyle;
     },
 
+    getOption: function(num) {
+        return(<option>{num}</option>);
+    },
+
     render: function() {
-        const food = this.props.food;
+        let options = [];
         const dateStyle = this.getDateStyle();
+        const food = this.props.food;
+        for (let i = 0; i <= food.quantity; i++) {
+            let option = this.getOption(i);
+            options.push(option);
+        }
+
         return (
             <tr style={dateStyle}>
-                <td>
-                    <input type="checkbox"
-                           className='checkboxes'
-                           checked={(this.props.selectedRows && this.props.selectedRows.indexOf(food.id)) >= 0}
-                           onChange={(e) => this.props.toggleOne(e.target.checked, food.id)} />
-                </td>
+                {
+                    !!this.props.isAdmin ?
+                    <td>
+                        <input type="checkbox"
+                            className='checkboxes'
+                            checked={(this.props.selectedRows && this.props.selectedRows.indexOf(food.id)) >= 0}
+                            onChange={(e) => this.props.toggleOne(e.target.checked, food.id)} />
+                    </td>
+                    :
+                    <td>
+                        <select 
+                            className="form-control" 
+                            onChange={(e) => this.props.selectFood(e.target.value,food.quantity,food.id)}
+                        >
+                            {options}
+                        </select>
+                    </td>
+                }
                 <td>{food.item}</td>
                 <td>{food.quantity}</td>
                 <td>{food.expire_date}</td>
@@ -76,6 +98,7 @@ const FoodsTable = React.createClass({
                     user={this.props.user}
                     isAdmin={this.props.isAdmin}
                     isExpired={isExpired}
+                    selectFood={this.props.selectFood}
                 />
             );
         }.bind(this));
@@ -87,9 +110,19 @@ const FoodsTable = React.createClass({
                 <table className="table table-bordered table-hover">
                     <thead>
                     <tr>
+                        {
+                        !!this.props.isAdmin ?
                         <th className="text-center" style={{width:'1.5%'}}>
                             <input type="checkbox" onChange={this.props.toggleAll} />
                         </th>
+                        :
+                        <th style={{width:'8%'}}>
+                            <a>
+                                Quantity
+                                <i className={this.props.sortClass('f.item')}></i>
+                            </a>
+                        </th>
+                        }
                         <th style={{width:'20%'}}>
                             <a onClick={this.props.sortChanged.bind(null, 'f.item', this.props.orderType)}>
                                 Item
@@ -98,7 +131,7 @@ const FoodsTable = React.createClass({
                         </th>
                         <th style={{width:'20%'}}>
                             <a onClick={this.props.sortChanged.bind(null, 'quantity', this.props.orderType)}>
-                                Quantity
+                                Number Available
                                 <i className={this.props.sortClass('quantity')}></i>
                             </a>
                         </th>
@@ -291,6 +324,7 @@ const ReadFoodsComponent = React.createClass({
             orderBy: this.props.orderBy,
             orderType: this.props.orderType,
             foods: [],
+            orderedFoods: [],
             count: 0,
             loading: true,
             selectedRows: [],
@@ -432,6 +466,38 @@ const ReadFoodsComponent = React.createClass({
         }
     },
 
+    selectFood: function(num, available, id) {
+        num = parseInt(num);
+        available = parseInt(available);
+        if (num >= 0 && num <= available) {
+            let foodsCopy = [...this.state.orderedFoods];
+            let wasFound = this.updateExistingFoodOrder(id, num, foodsCopy);
+            if (!wasFound) {
+                this.selectNewFood(id, num);
+            }
+        } else {
+            console.log('Error in input parameters!');
+        }
+    },
+
+    selectNewFood: function(id, num) {
+        this.setState({
+            orderedFoods: this.state.orderedFoods.concat({id: id, quantity: num})
+        });
+    },
+
+    updateExistingFoodOrder: function(id, num, foodsCopy) {
+        let wasFound = false;
+        for (let i = 0; i < foodsCopy.length; i++) {
+            if (foodsCopy[i].id == id) {
+                foodsCopy[i].quantity = num;
+                this.setState({orderedFoods: foodsCopy});
+                wasFound = true;
+            } 
+        }
+        return wasFound;
+    },
+
     deleteSelected: function() {
         if(this.state.selectedRows.length > 0) {
             let r = confirm("Are you sure you want to delete the selected item(s)?");
@@ -459,17 +525,16 @@ const ReadFoodsComponent = React.createClass({
     },
 
     placeOrder: function() {
-        if (this.state.selectedRows.length > 0) {
+        if (this.state.orderedFoods.length > 0) {
             $.post('api/create_order.php',
                 {
-                    items: this.state.confirmationList,
+                    items: JSON.stringify(this.state.confirmationList),
                     userId: this.props.user.id
                 },
                 function (res) {
-                    console.log(res);
                     if (res == 'true' || res == 1) {
                         alert('Order Placed Successfully!');
-                        this.setState({selectedRows: []});
+                        this.setState({orderedFoods: []});
                         this.setState({confirmationList: []}, () => this.populateFoods());
                     } else {
                         alert('Order Failed! ', res);
@@ -479,11 +544,7 @@ const ReadFoodsComponent = React.createClass({
     },
 
     buildConfirmationList: function() {
-        let confirmationList = [];
-        for (let i = 0; i < this.state.selectedRows.length; i++) {
-            confirmationList.push(this.state.selectedRows[i]);
-        }
-        this.setState({confirmationList: confirmationList});
+        this.setState({confirmationList: this.state.orderedFoods});
     },
 
     itemPerPageChanged: function(e) {
@@ -499,9 +560,9 @@ const ReadFoodsComponent = React.createClass({
     render: function() {
         let filteredFoods;
         if (this.state.search === '') {
-            filteredFoods = this.state.foods;
+            filteredFoods = [...this.state.foods];
         } else {
-            filteredFoods = this.state.foods.filter(food => food.item.toLowerCase().includes(this.state.search.toLowerCase()));
+            filteredFoods = [...this.state.foods].filter(food => food.item.toLowerCase().includes(this.state.search.toLowerCase()));
         }
         if(this.state.search != ''){
             $('.page-header h1').text('Search "'+ this.state.search +'"');
@@ -536,6 +597,7 @@ const ReadFoodsComponent = React.createClass({
                     isLoggedIn={this.props.isLoggedIn}
                     user={this.props.user}
                     isAdmin={this.props.isAdmin}
+                    selectFood={this.selectFood}
                 />
 
                 <PaginationComponent
@@ -550,7 +612,7 @@ const ReadFoodsComponent = React.createClass({
                     orderBy={this.props.orderBy}
                     orderType={this.props.orderType} />
                 <ConfirmationModal
-                    confirmationList={this.state.confirmationList}
+                    confirmationList={this.state.orderedFoods}
                     placeOrder={this.placeOrder}
                 />
             </div>
@@ -579,13 +641,13 @@ class ItemDetails extends React.Component {
             const f = JSON.parse(food)[0];
             this.setState({id: f.id});
             this.setState({item: f.item});
-            this.setState({quantity: f.quantity});
+            this.setState({quantity: this.props.quantity});
         }.bind(this));
     }
     
     render() {
         return(
-            <p>{this.state.item} : {this.state.quantity}</p>
+            <p>{this.state.item}</p>
         );
     }
 };
@@ -601,7 +663,7 @@ const ConfirmationModal = React.createClass({
                     </div>
                     <div className="modal-body">
                         { this.props.confirmationList.length > 0 ?
-                            this.props.confirmationList.map((i,key) => <ItemDetails key={key} foodId={i}/>)
+                            this.props.confirmationList.map((i,key) => <ItemDetails key={key} foodId={i.id} quantity={i.quantity}/>)
                             : <p>Please select at least one item.</p>
                         }
                     </div>

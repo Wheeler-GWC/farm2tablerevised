@@ -9,6 +9,7 @@ class Order{
     public $items;
     public $userId;
     public $last_id;
+    public $item_id;
     public $quantity = 1;
 
     public function __construct($db){
@@ -35,14 +36,15 @@ class Order{
 
     public function create_items() {
         try {
-            $query = "INSERT INTO order_items SET order_id=:order_id, item_id=:item_id;";
+            $query = "INSERT INTO order_items SET order_id=:order_id, item_id=:item_id, quantity=:quantity;";
             $query .= "UPDATE food_items SET quantity = quantity - :quantity WHERE id=:item_id";
             $stmt = $this->conn->prepare($query);
             $last_id=htmlspecialchars(strip_tags($this->last_id));
             $stmt->bindParam(':order_id', $last_id);
-            $item=htmlspecialchars(strip_tags($this->item));
-            $stmt->bindParam(':item_id', $item);
-            $quantity = htmlspecialchars(strip_tags(this->quantity));
+            $item=$this->item;
+            $item_id=htmlspecialchars(strip_tags($item->id));
+            $quantity=htmlspecialchars(strip_tags($item->quantity));
+            $stmt->bindParam(':item_id', $item_id);
             $stmt->bindParam(':quantity', $quantity);
             $stmt->execute();
 
@@ -86,7 +88,7 @@ class Order{
     }
 
     public function readAllWithDetails(){
-        $query = "SELECT u.email, i.id, o.created_at, i.is_fulfilled, f.item, f.quantity FROM orders o ";
+        $query = "SELECT u.email, i.id, o.created_at, i.is_fulfilled, f.item, i.quantity FROM orders o ";
         $query .= "INNER JOIN users u ON o.userId = u.id ";
         $query .= "INNER JOIN order_items i ON o.id = i.order_id ";
         $query .= "INNER JOIN food_items f ON i.item_id = f.id ";
