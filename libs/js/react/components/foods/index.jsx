@@ -467,11 +467,35 @@ const ReadFoodsComponent = React.createClass({
     },
 
     selectFood: function(num, available, id) {
-        if (num > 0 && num <= available) {
-            this.setState({
-                orderedFoods: this.state.orderedFoods.concat({id: id, quantity: num})
-            });
-        } 
+        num = parseInt(num);
+        available = parseInt(available);
+        if (num >= 0 && num <= available) {
+            let foodsCopy = [...this.state.orderedFoods];
+            let wasFound = this.updateExistingFoodOrder(id, num, foodsCopy);
+            if (!wasFound) {
+                this.selectNewFood(id, num);
+            }
+        } else {
+            console.log('Error in input parameters!');
+        }
+    },
+
+    selectNewFood: function(id, num) {
+        this.setState({
+            orderedFoods: this.state.orderedFoods.concat({id: id, quantity: num})
+        });
+    },
+
+    updateExistingFoodOrder: function(id, num, foodsCopy) {
+        let wasFound = false;
+        for (let i = 0; i < foodsCopy.length; i++) {
+            if (foodsCopy[i].id == id) {
+                foodsCopy[i].quantity = num;
+                this.setState({orderedFoods: foodsCopy});
+                wasFound = true;
+            } 
+        }
+        return wasFound;
     },
 
     deleteSelected: function() {
@@ -536,9 +560,9 @@ const ReadFoodsComponent = React.createClass({
     render: function() {
         let filteredFoods;
         if (this.state.search === '') {
-            filteredFoods = this.state.foods;
+            filteredFoods = [...this.state.foods];
         } else {
-            filteredFoods = this.state.foods.filter(food => food.item.toLowerCase().includes(this.state.search.toLowerCase()));
+            filteredFoods = [...this.state.foods].filter(food => food.item.toLowerCase().includes(this.state.search.toLowerCase()));
         }
         if(this.state.search != ''){
             $('.page-header h1').text('Search "'+ this.state.search +'"');
@@ -588,7 +612,7 @@ const ReadFoodsComponent = React.createClass({
                     orderBy={this.props.orderBy}
                     orderType={this.props.orderType} />
                 <ConfirmationModal
-                    confirmationList={this.state.confirmationList}
+                    confirmationList={this.state.orderedFoods}
                     placeOrder={this.placeOrder}
                 />
             </div>
@@ -623,7 +647,7 @@ class ItemDetails extends React.Component {
     
     render() {
         return(
-            <p>{this.state.item} : {this.state.quantity}</p>
+            <p>{this.state.item}</p>
         );
     }
 };
