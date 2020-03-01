@@ -3,7 +3,7 @@
 const FoodRow = React.createClass({
     getDateStyle: function() {
         let dateStyle;
-        if (this.props.isExpired) {
+        if (this.props.isExpired || this.props.food.quantity == 0) {
             dateStyle = {
                 color: 'red'
             };
@@ -27,7 +27,6 @@ const FoodRow = React.createClass({
             let option = this.getOption(i);
             options.push(option);
         }
-
         return (
             <tr style={dateStyle}>
                 {
@@ -86,7 +85,7 @@ const FoodsTable = React.createClass({
         let rows = this.props.foods.map(function(food, i) {
             const isExpired = this.checkForExpiration(food);
             return (
-                (isExpired && !this.props.isAdmin) ?
+                (!this.props.isAdmin) && (isExpired || food.quantity == 0) ?
                 null :
                 <FoodRow
                     key={i}
