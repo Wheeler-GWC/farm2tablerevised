@@ -19,6 +19,13 @@ const FoodRow = React.createClass({
         return(<option>{num}</option>);
     },
 
+    getFormattedDate: function(date) {
+        const month = date.substring(5,7);
+        const day = date.substring(8,10);
+        const year = date.substring(0,4);
+        return (month + '/' + day + '/' + year); 
+    },
+
     render: function() {
         let options = [];
         const dateStyle = this.getDateStyle();
@@ -26,6 +33,10 @@ const FoodRow = React.createClass({
         for (let i = 0; i <= food.quantity; i++) {
             let option = this.getOption(i);
             options.push(option);
+        }
+        let date;
+        if (food.expire_date) {
+            date = this.getFormattedDate(food.expire_date);
         }
         return (
             <tr style={dateStyle}>
@@ -49,7 +60,7 @@ const FoodRow = React.createClass({
                 }
                 <td>{food.item}</td>
                 <td>{food.quantity}</td>
-                <td>{food.expire_date}</td>
+                <td>{date}</td>
                 {
                     (this.props.isLoggedIn && !!this.props.isAdmin) &&
                         <td>
