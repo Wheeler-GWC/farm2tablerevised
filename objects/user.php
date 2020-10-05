@@ -8,6 +8,7 @@ class User{
     public $email;
     public $password;
     public $is_admin;
+    public $token;
 
     public function __construct($db){
         $this->conn = $db;
@@ -89,6 +90,26 @@ class User{
         }
     }
 
+    public function insertIntoPasswordResets() {
+        try {
+            $sql = "INSERT INTO password_resets(email, token) VALUES ('$email', '$token')";
+
+            $stmt = $this->conn->prepare($query);
+            $email=htmlspecialchars(strip_tags($this->email));
+            $stmt->bindParam(':email', $email);
+            $token=htmlspecialchars(strip_tags($this->token));
+            $stmt->bindParam(':token', $token);
+            if($stmt->execute()){
+                return 'true';
+            }else{
+                return 'false';
+            }
+        }
+        catch(PDOException $exception){
+            die('ERROR: ' . $exception->getMessage());
+        }
+    }
+
     public function paginate($where = '', $page = 1, $limit = 10, $orderBy = 'id', $orderType = 'desc') {
         $query = "SELECT id, email
               FROM ". $this->table_name ."
@@ -151,11 +172,26 @@ class User{
         return json_encode($results);
     }
 
+    public function getUserByEmail(){
+
+        $query = "SELECT id FROM users WHERE email = :email";
+
+        $stmt = $this->conn->prepare($query);
+
+        $id=htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        $results=$stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
+    }
+
     public function update(){
 
         $query = "UPDATE users
                 SET password=:password
-                WHERE id=:id";
+                WHERE email=:email";
 
         $stmt = $this->conn->prepare($query);
         $password=htmlspecialchars(strip_tags($this->password));
@@ -179,5 +215,19 @@ class User{
         }else{
             return false;
         }
+    }
+
+    public function getEmailByToken() {
+        $query = "SELECT email FROM password_resets WHERE token = :token";
+
+        $stmt = $this->conn->prepare($query);
+
+        $id=htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(':token', $token);
+        $stmt->execute();
+
+        $results=$stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
     }
 }
