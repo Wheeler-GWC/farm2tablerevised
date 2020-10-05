@@ -20,7 +20,7 @@ if($_POST) {
             $user->insertIntoPasswordResets();
             $to = $email;
             $subject = "Reset your password on whsfarm2table.org";
-            $msg = "Hi there, click on this <a href=\"new_password.php?token=" . $token . "\">link</a> to reset your password on our site";
+            $msg = "Hi there, click on this <a href=\"" . $database->site . "/#reset?token=" . $token . "\">link</a> to reset your password on our site";
             $msg = wordwrap($msg,70);
             $headers = "From: noreply@whsfarm2table.org";
             mail($to, $subject, $msg, $headers);

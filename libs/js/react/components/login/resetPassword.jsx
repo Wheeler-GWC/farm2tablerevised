@@ -22,14 +22,13 @@ const ResetPasswordComponent = React.createClass({
 
     submitChange: function(e) {
         $.post('api/password_recovery.php', {
-            //email: this.state.email,
             password: this.state.password,
-            password_confirmation: this.state.passwordConfirmation
+            password_confirmation: this.state.passwordConfirmation,
+            token: this.props.token
         },
         function(res) {
             this.setState({successRegister: res});
             if(res == 'true') {
-                //this.setState({email: ''});
                 this.setState({password: ''});
                 this.setState({passwordConfirmation: ''});
             }

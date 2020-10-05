@@ -19,7 +19,7 @@ if($_POST) {
         $new_pass = $_POST['new_pass'];
         $new_pass_c = $_POST['new_pass_c'];
 
-        $token = $_SESSION['token'];
+        $token = $_POST['token'];
         if (empty($new_pass) || empty($new_pass_c)) array_push($errors, "Password is required");
         if ($new_pass !== $new_pass_c) array_push($errors, "Password do not match");
         if (count($errors) == 0) {
