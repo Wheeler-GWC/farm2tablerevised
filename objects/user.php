@@ -217,7 +217,7 @@ class User{
 
         $stmt = $this->conn->prepare($query);
 
-        $id=htmlspecialchars(strip_tags($this->id));
+        $token=htmlspecialchars(strip_tags($this->token));
         $stmt->bindParam(':token', $token);
         $stmt->execute();
 
