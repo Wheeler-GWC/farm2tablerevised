@@ -173,18 +173,13 @@ class User{
     }
 
     public function getUserByEmail(){
-
-        $query = "SELECT id FROM users WHERE email = :email";
+        $query = "SELECT * FROM users WHERE email = :email";
 
         $stmt = $this->conn->prepare($query);
-
-        $id=htmlspecialchars(strip_tags($this->id));
-        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':email', $this->email);
         $stmt->execute();
 
-        $results=$stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return json_encode($results);
+        return (bool)$stmt->fetchColumn();
     }
 
     public function update(){
