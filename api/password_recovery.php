@@ -3,6 +3,9 @@ if($_POST) {
     include_once '../config/core.php';
     include_once '../config/database.php';
     include_once '../objects/user.php';
+    include_once '../ChromePhp.php';
+
+    //ChromePhp::log($_POST['token']);
 
     $database = new Database();
     $db = $database->getConnection();
@@ -16,8 +19,8 @@ if($_POST) {
     } else if($_POST['password_confirmation'] != $_POST['password']) {
         $result = "The password confirmation did not match.";
     } else {
-        $new_pass = $_POST['new_pass'];
-        $new_pass_c = $_POST['new_pass_c'];
+        $new_pass = $_POST['password'];
+        $new_pass_c = $_POST['password_confirmation'];
 
         $token = $_POST['token'];
         if (empty($new_pass) || empty($new_pass_c)) array_push($errors, "Password is required");
@@ -25,8 +28,10 @@ if($_POST) {
         if (count($errors) == 0) {
             $user->token = $token;
             $obj = $user->getEmailByToken();
-            if ($obj) {
-                $user->password = $_POST['password'];
+            $email = json_decode($obj)[0];
+            if (!empty($email)) {
+                $user->email = $email;
+                $user->password = $new_pass;
                 $obj = $user->update();
                 $result = $obj;
             } else {
@@ -34,6 +39,6 @@ if($_POST) {
             }
         }
     }
-
+    ChromePhp::log($result);
     echo $result;
 }

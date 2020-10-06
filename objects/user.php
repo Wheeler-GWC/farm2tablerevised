@@ -92,9 +92,9 @@ class User{
 
     public function insertIntoPasswordResets() {
         try {
-            $sql = "INSERT INTO password_resets(email, token) VALUES ('$email', '$token')";
+            $sql = "INSERT INTO password_resets(email, token) VALUES (:email, :token)";
 
-            $stmt = $this->conn->prepare($query);
+            $stmt = $this->conn->prepare($sql);
             $email=htmlspecialchars(strip_tags($this->email));
             $stmt->bindParam(':email', $email);
             $token=htmlspecialchars(strip_tags($this->token));
@@ -189,6 +189,8 @@ class User{
                 WHERE email=:email";
 
         $stmt = $this->conn->prepare($query);
+        $email=htmlspecialchars(strip_tags($this->email));
+        $stmt->bindParam(':email', $email);
         $password=htmlspecialchars(strip_tags($this->password));
         $stmt->bindParam(':password', $password);
 
@@ -221,7 +223,7 @@ class User{
         $stmt->bindParam(':token', $token);
         $stmt->execute();
 
-        $results=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results=$stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
         return json_encode($results);
     }

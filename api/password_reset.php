@@ -17,6 +17,7 @@ if($_POST) {
         $result = $user->getUserByEmail();
         if($result) {
             $token = bin2hex(random_bytes(50));
+            $user->token = $token;
             $user->insertIntoPasswordResets();
             $to = $email;
             $subject = "Reset your password on whsfarm2table.org";
