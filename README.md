@@ -11,6 +11,7 @@ It should contains the following code:
 class Database{
 
     private $host = "localhost";
+    public $site = "localhost/farm2tablerevised"; //change to whsfarm2table.org when deployed.
     private $db_name = "farm2table";
     private $username = "root";
     private $password = "root";
