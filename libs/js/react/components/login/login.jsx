@@ -110,9 +110,10 @@ const ForgotPasswordModal = React.createClass({
             email: this.state.email
         },
         function(result) {
-            var res = JSON.parse(result);
-            if (!!res) {
+            console.log("result: " + result);
+            if (result == 1) {
                 alert("Please check your email for a password reset link.");
+                window.location.reload();
             }
         }.bind(this));
     e.preventDefault();
