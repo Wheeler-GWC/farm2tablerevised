@@ -97,6 +97,7 @@ var MainApp = React.createClass({
         currentMode = currentMode.startsWith('delete') ? (currentMode.split('?'))[0] : currentMode;
         currentMode = currentMode.startsWith('login') ? (currentMode.split('?'))[0] : currentMode;
         currentMode = currentMode.startsWith('register') ? (currentMode.split('?'))[0] : currentMode;
+        currentMode = currentMode.startsWith('reset') ? (currentMode.split('?'))[0] : currentMode;
 
         var foodId = 0;
         var searchedTerm = '';
@@ -214,6 +215,11 @@ var MainApp = React.createClass({
                                     user={this.state.user}
                                     isAdmin={isAdmin}
                                 />;
+                break;
+            case 'reset':
+                modeComponent = <ResetPasswordComponent 
+                    token={window.location.href.split("token=")[1]}
+                />
                 break;
             default:
                 $('.page-header').html('<h1>404</h1>');

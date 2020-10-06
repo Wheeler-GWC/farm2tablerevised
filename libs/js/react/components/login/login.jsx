@@ -1,6 +1,6 @@
 "use strict";
 
-var LoginComponent = React.createClass({
+const LoginComponent = React.createClass({
     getInitialState: function() {
         return {
             id: null,
@@ -80,10 +80,61 @@ var LoginComponent = React.createClass({
                         <input type="password" className="form-control" placeholder="Password" name="password" onChange={this.onPasswordChanged} />
 
                         <button className="btn btn-lg btn-primary btn-block" type="submit" onClick={this.login}>Sign in</button>
+                        <br/>
+                        <p><a href="#" data-toggle="modal" data-target="#forgotPasswordModal">Forgot your password?</a></p>
                     </form>
                 </div>
                 <div className="col-md-4"></div>
+                <ForgotPasswordModal />
             </div>
         );
     }
 });
+
+
+const ForgotPasswordModal = React.createClass({
+    getInitialState: function() {
+        return {
+            email: ''
+        };
+    },
+
+    onEmailChanged: function(e) {
+        this.setState({
+            email: e.target.value
+        });
+    },
+
+    submit: function(e) {
+        $.post('api/password_reset.php', {
+            email: this.state.email
+        },
+        function(result) {
+            if (result == 1) {
+                alert("Please check your email for a password reset link.");
+                window.location.reload();
+            }
+        }.bind(this));
+    e.preventDefault();
+    },
+
+    render: function() {
+        return (
+            <div className="modal" id="forgotPasswordModal" tabindex="-1" z-index="1" role="dialog" aria-labelledby="modalCenterTitle" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4>Please enter your email address to retrieve your password.</h4>
+                            <form>
+                                <input type="email" className="form-control" placeholder="Email address" name="email" value={this.state.email} onChange={this.onEmailChanged} />
+                                <br/>
+                                <button className="btn btn-lg btn-primary btn-block" type="submit" name="reset-password" onClick={this.submit}>Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+});
+

@@ -1,3 +1,7 @@
 .vscode/
 phpinfo.php
 config/database.php
+ChromePhp.php
+composer.json
+composer.lock
+vendor/

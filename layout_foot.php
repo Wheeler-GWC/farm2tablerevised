@@ -16,6 +16,7 @@
 <script src="libs/js/react/components/orders/index.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/login/login.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/login/register.jsx" type="text/jsx"></script>
+<script src="libs/js/react/components/login/resetPassword.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/layouts/nav.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/layout.jsx" type="text/jsx"></script>
 
