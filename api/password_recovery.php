@@ -3,13 +3,11 @@ if($_POST) {
     include_once '../config/core.php';
     include_once '../config/database.php';
     include_once '../objects/user.php';
-    include_once '../ChromePhp.php';
-
-    //ChromePhp::log($_POST['token']);
 
     $database = new Database();
     $db = $database->getConnection();
     $user = new User($db);
+    $errors = [];
 
     $result = 'true';
     if(is_null($_POST['password']) || empty($_POST['password'])) {
@@ -33,11 +31,13 @@ if($_POST) {
                 $user->email = $email;
                 $user->password = $new_pass;
                 $obj = $user->update();
+                $logged = "obj value: " . $obj;
                 $result = $obj;
             } else {
                 array_push($errors, "Password do not match");
             }
         }
     }
+
     echo $result;
 }

@@ -8,6 +8,10 @@ const ResetPasswordComponent = React.createClass({
         };
     },
 
+    componentDidMount: function() {
+        $('.page-header h1').text('Reset Password');
+    },
+
     onPasswordChanged: function(e) {
         this.setState({
             password: e.target.value
@@ -27,9 +31,12 @@ const ResetPasswordComponent = React.createClass({
             token: this.props.token
         },
         function(res) {
-            if(res == 'true') {
-                alert("Password changed successfully!");
+            console.log(res);
+            if(res == 1) {
                 window.location.href = '#';
+                alert("Password changed successfully!");
+            } else {
+                alert("There was a problem updating your password. Please try again.");
             }
         }.bind(this));
         e.preventDefault();
@@ -41,14 +48,14 @@ const ResetPasswordComponent = React.createClass({
                 <form>
                     <div className="form-group">
                         <label>New Password</label>
-                        <input type="password" name="new_pass" onChange={this.onPasswordChanged}></input>
+                        <input className="form-control" type="password" name="new_pass" onChange={this.onPasswordChanged}></input>
                     </div>
                     <div className="form-group">
                         <label>Confirm Password</label>
-                        <input type="password" name="new_pass_c" onChange={this.onPasswordConfirmationChanged}></input>
+                        <input className="form-control" type="password" name="new_pass_c" onChange={this.onPasswordConfirmationChanged}></input>
                     </div>
                     <div className="form-group">
-                        <button type="submit" name="new_password" onClick={this.submitChange}>Submit</button>
+                        <button className="btn btn-lg btn-primary btn-block" type="submit" name="new_password" onClick={this.submitChange}>Submit</button>
                     </div>
                 </form>
             </div>
