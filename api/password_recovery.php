@@ -31,8 +31,9 @@ if($_POST) {
                 $user->email = $email;
                 $user->password = $new_pass;
                 $obj = $user->update();
-                $logged = "obj value: " . $obj;
-                $result = $obj;
+                if ($obj == true || $obj == 'true') {
+                    $result = 1;
+                }
             } else {
                 array_push($errors, "Password do not match");
             }

@@ -31,8 +31,7 @@ const ResetPasswordComponent = React.createClass({
             token: this.props.token
         },
         function(res) {
-            console.log(res);
-            if(res == 1) {
+            if(res == 'true') {
                 window.location.href = '#';
                 alert("Password changed successfully!");
             } else {
