@@ -22,7 +22,8 @@ if($_POST) {
                 $user->insertIntoPasswordResets();
                 $to = $email;
                 $subject = "Reset your password on whsfarm2table.org";
-                $msg = "Hi there, click on this <a href=\"" . $database->site . "/#reset?token=" . $token . "\">link</a> to reset your password on our site";
+                $msg = "Hi there, click on the following link or paste it in your browser address bar to reset your password on our site.";
+                $msg .= "\n\n" . $database->site . "/#reset?token=" . $token;
                 $msg = wordwrap($msg,70);
                 $headers = "From: noreply@whsfarm2table.org";
                 $headers  = 'MIME-Version: 1.0' . "\r\n";
