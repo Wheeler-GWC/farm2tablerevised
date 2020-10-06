@@ -192,7 +192,8 @@ class User{
         $email=htmlspecialchars(strip_tags($this->email));
         $stmt->bindParam(':email', $email);
         $password=htmlspecialchars(strip_tags($this->password));
-        $stmt->bindParam(':password', $password);
+        $salted_password = password_hash($password, PASSWORD_BCRYPT);
+        $stmt->bindParam(':password', $salted_password);
 
         if($stmt->execute()){
             return true;

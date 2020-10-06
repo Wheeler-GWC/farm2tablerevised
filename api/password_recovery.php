@@ -39,6 +39,5 @@ if($_POST) {
             }
         }
     }
-    ChromePhp::log($result);
     echo $result;
 }
