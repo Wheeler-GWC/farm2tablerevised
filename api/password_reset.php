@@ -25,6 +25,8 @@ if($_POST) {
                 $msg = "Hi there, click on this <a href=\"" . $database->site . "/#reset?token=" . $token . "\">link</a> to reset your password on our site";
                 $msg = wordwrap($msg,70);
                 $headers = "From: noreply@whsfarm2table.org";
+                $headers  = 'MIME-Version: 1.0' . "\r\n";
+                $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
                 mail($to, $subject, $msg, $headers);
                 $response = 1;
             }
