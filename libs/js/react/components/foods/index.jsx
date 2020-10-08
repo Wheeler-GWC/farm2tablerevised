@@ -513,7 +513,7 @@ const ReadFoodsComponent = React.createClass({
             if (r == true) {
                 $.post('api/delete_foods.php',
                     {del_ids: this.state.selectedRows},
-                    function (res) {
+                    function(res) {
                         if (res == 'true') {
                             this.setState({
                                 foods: this.state.foods.filter((el) =>
@@ -540,15 +540,47 @@ const ReadFoodsComponent = React.createClass({
                     items: JSON.stringify(this.state.orderedFoods),
                     userId: this.props.user.id
                 },
-                function (res) {
-                    if (res == 'true' || res == 1) {
+                function(res) {
+                    if (res > 1) {
                         alert('Order Placed Successfully!');
                         this.setState({orderedFoods: []}, () => this.populateFoods());
+                        this.getOrderDetails(res);
                     } else {
                         alert('Order Failed! ', res);
                     }
                 }.bind(this));
         } 
+    },
+
+    getOrderDetails: function(lastId) {
+        $.post('api/read_one_order.php', {
+            lastId: lastId
+        }, function(res){
+            this.buildEmailContent(JSON.parse(res));
+        }.bind(this));
+    },
+
+    buildEmailContent: function(orderContent) {
+        let emailContent = '';
+        let userEmail = orderContent[0]['email'];
+        let orderTime = orderContent[0]['created_at'];
+        for (let i = 0; i < orderContent.length; i++) {
+            emailContent += orderContent[i]['item'];
+            emailContent += ' x ';
+            emailContent += orderContent[i]['quantity'];
+            emailContent += '\n';
+        }
+        this.sendConfirmationEmail(userEmail, orderTime, emailContent);
+    },
+
+    sendConfirmationEmail: function(userEmail, orderTime, emailContent) {
+        $.post('api/send_confirmation_email.php', {
+            userEmail: userEmail,
+            orderTime: orderTime,
+            emailContent: emailContent
+        }, function(res){
+            console.log("Confirmation email sent.");
+        }.bind(this));
     },
 
     itemPerPageChanged: function(e) {

@@ -8,7 +8,7 @@ if($_POST){
     $db = $database->getConnection();
     $order = new Order($db);
 
-    $result;
+    $result = 0;
     $order->items = json_decode($_POST['items'], false);
     $order->userId = $_POST['userId'];
 
@@ -21,14 +21,14 @@ if($_POST){
             $order->item_id = $order->item->id;
             $order->quantity = $order->item->quantity;
             if ($order->create_items()) {
-                $result = true;
+                $result = $order->last_id;
             } else {
-                $result = false;
+                $result = 0;
             }
         }
     }
     catch(PDOException $exception){
-        $result = false;
+        $result = 0;
     }
 
     echo $result;
