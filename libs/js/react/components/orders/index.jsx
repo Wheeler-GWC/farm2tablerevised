@@ -101,7 +101,7 @@ const ReadOrdersComponent = React.createClass({
             $.post('api/fulfill_order.php',
                 {order_id: orderId},
                 function(res) {
-                    console.log(res);
+                    console.log("Order marked as fulfilled.");
                 }.bind(this)
             );
         }

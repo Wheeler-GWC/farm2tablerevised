@@ -102,6 +102,22 @@ class Order{
         return json_encode($orders);
     }
 
+    public function readOneWithDetails(){
+        $query = "SELECT o.created_at, f.item, i.quantity, u.email FROM orders o ";
+        $query .= "INNER JOIN users u ON o.userId = u.id ";
+        $query .= "INNER JOIN order_items i ON o.id = i.order_id ";
+        $query .= "INNER JOIN food_items f ON i.item_id = f.id ";
+        $query .= "WHERE o.id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->execute();
+
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($orders);
+    }
+
     public function fulfill() {
         $query = "UPDATE order_items SET is_fulfilled = 1 WHERE id=:id";
         $stmt = $this->conn->prepare($query);
