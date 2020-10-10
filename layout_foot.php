@@ -8,6 +8,7 @@
 
 <!-- main react components -->
 <!--<script type="text/babel" src="libs/js/react/main.js"></script>-->
+<script src="libs/js/react/components/homepage.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/foods/delete.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/foods/edit.jsx" type="text/jsx"></script>
 <script src="libs/js/react/components/foods/create.jsx" type="text/jsx"></script>

@@ -87,7 +87,7 @@ var MainApp = React.createClass({
         var defaultOrderBy = 'f.item';
         var defaultOrderType = 'asc';
 
-        var currentMode = this.props.location[0] || 'read';
+        var currentMode = this.props.location[0] || 'home';
 
         currentMode = currentMode.startsWith('update') ? (currentMode.split('?'))[0] : currentMode;
         currentMode = currentMode.startsWith('create') ? (currentMode.split('?'))[0] : currentMode;
@@ -97,6 +97,7 @@ var MainApp = React.createClass({
         currentMode = currentMode.startsWith('delete') ? (currentMode.split('?'))[0] : currentMode;
         currentMode = currentMode.startsWith('login') ? (currentMode.split('?'))[0] : currentMode;
         currentMode = currentMode.startsWith('register') ? (currentMode.split('?'))[0] : currentMode;
+        currentMode = currentMode.startsWith('read') ? (currentMode.split('?'))[0] : currentMode;
         currentMode = currentMode.startsWith('reset') ? (currentMode.split('?'))[0] : currentMode;
 
         var foodId = 0;
@@ -127,7 +128,13 @@ var MainApp = React.createClass({
         sortType = (order_type === undefined) ? defaultOrderType : order_type;
         itemPerPage = (item_per_page === undefined) ? defaultItemPerPage : item_per_page;
 
-        var modeComponent = <ReadFoodsComponent 
+        var modeComponent = <HomepageComponent />;
+
+        switch(currentMode) {
+            case 'home':
+                break;
+            case 'read':
+                modeComponent = <ReadFoodsComponent 
                                 itemPerPage={defaultItemPerPage} 
                                 currentPage={defaultCurrentPage} 
                                 search={defaultSearchText} 
@@ -137,9 +144,6 @@ var MainApp = React.createClass({
                                 user={this.state.user}
                                 isAdmin={isAdmin}
                             />;
-
-        switch(currentMode) {
-            case 'read':
                 break;
             case 'page':
                 initialPage = getParameterByName(pageParameterName);

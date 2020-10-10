@@ -12,6 +12,9 @@
     <link href="libs/js/bootstrap/dist/css/bootstrap.css" rel="stylesheet" media="screen">
     <link href="libs/js/bootstrap/font-awesome.min.css" rel="stylesheet" type="text/css" media="screen" />
 
+    <!-- Custom CSS -->
+    <link href="css/homepage.css"  rel="stylesheet" type="text/css" media="screen" />
+
     <!-- HTML5 Shiv and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -49,7 +52,4 @@
 <body>
 
 <!-- container -->
-<div class="container">
-    <div class="page-header" style="margin-top:70px;">
-        <h1>Loading..</h1>
-    </div>
+<div class="container mainContent">

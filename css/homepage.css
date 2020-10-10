@@ -1,0 +1,14 @@
+body {
+    background-color: cornsilk;
+}
+
+.mainContent {
+    background-color: white;
+    margin-top: 70px;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.homepageTitle {
+    color: blue;
+}
